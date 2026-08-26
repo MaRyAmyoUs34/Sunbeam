@@ -1,34 +1,37 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Perfect Day ~ Interactive Scrapbook</title>
+    <title>A Perfect Day ~ Premium Cozy Arcade Game</title>
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #fff0f5;
-            --card-bg: rgba(255, 255, 255, 0.85);
+            --bg-color: #ffeef2;
+            --card-bg: rgba(255, 255, 255, 0.92);
             --text-color: #5c4033;
             --accent: #ffb6c1;
-            --shadow: 0 10px 30px rgba(255, 182, 193, 0.3);
-            --diary-bg: #fffbf0;
+            --accent-dark: #ff8fa3;
+            --shadow: 0 15px 35px rgba(255, 182, 193, 0.45);
         }
 
-        body.dark-mode {
-            --bg-color: #2c2230;
-            --card-bg: rgba(45, 35, 48, 0.85);
+        body.night-vibe {
+            --bg-color: #231929;
+            --card-bg: rgba(45, 33, 54, 0.92);
             --text-color: #f3e8ff;
-            --accent: #d8b4fe;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            --diary-bg: #3b2d40;
+            --accent: #ca96ff;
+            --accent-dark: #b16eff;
+            --shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            transition: background 0.4s ease, color 0.4s ease;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         body {
@@ -37,272 +40,516 @@
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
-            padding: 20px;
+            overflow: hidden;
+            transition: background 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+            padding: 15px;
         }
 
-        .container {
+        .ambient-bg {
+            position: absolute;
             width: 100%;
-            max-width: 800px;
+            height: 100%;
+            top: 0; left: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .game-wrapper {
+            width: 100%;
+            max-width: 480px;
             background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 2px dashed var(--accent);
-            border-radius: 25px;
-            padding: 40px;
+            border: 3px dashed var(--accent);
+            border-radius: 35px;
+            padding: 25px;
             box-shadow: var(--shadow);
-            position: relative;
             text-align: center;
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 2.8rem;
-            margin-bottom: 5px;
-            color: var(--accent);
+            font-size: 2.3rem;
+            color: var(--accent-dark);
+            margin-bottom: 2px;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
         }
 
-        p.subtitle {
-            font-size: 1.1rem;
-            margin-bottom: 25px;
-            opacity: 0.8;
+        body.night-vibe h1 {
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.3);
         }
 
-        /* Music Player Box */
-        .music-player {
-            background: var(--bg-color);
-            border: 1px solid var(--accent);
-            border-radius: 15px;
-            padding: 12px 20px;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .music-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-        }
-
-        .disc {
-            font-size: 1.5rem;
-            animation: spin 3s linear infinite;
-            animation-play-state: paused;
-        }
-
-        .disc.playing {
-            animation-play-state: running;
-        }
-
-        @keyframes spin {
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Scrapbook Grid */
-        .moments-grid {
+        .hud-panel {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
         }
 
-        .moment-card {
-            background: var(--bg-color);
-            border: 2px solid var(--accent);
-            border-radius: 15px;
-            padding: 20px;
-            cursor: pointer;
-            transform: translateY(0);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .moment-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-
-        .moment-card span {
-            font-size: 2.5rem;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .display-box {
-            background: var(--bg-color);
-            border-radius: 15px;
-            padding: 25px;
-            min-height: 100px;
+        .hud-card {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--accent);
+            padding: 6px 10px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 0.95rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            font-style: italic;
-            border: 1px solid var(--accent);
-            margin-bottom: 25px;
+            gap: 6px;
+        }
+        body.night-vibe .hud-card {
+            background: rgba(0, 0, 0, 0.2);
         }
 
-        /* Interactive Diary Concept */
-        .diary-section {
-            background: var(--diary-bg);
-            border: 1px solid var(--accent);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            text-align: left;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+        .high-score-tag {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
-        .diary-section h4 {
-            font-family: 'Playfair Display', serif;
-            margin-bottom: 10px;
-            color: var(--accent);
-        }
-
-        .diary-input {
+        #timer-bar-container {
             width: 100%;
-            height: 80px;
-            background: transparent;
-            border: none;
-            border-bottom: 1px dashed var(--accent);
-            font-family: 'Caveat', cursive;
-            font-size: 1.5rem;
-            line-height: 1.8rem;
-            color: var(--text-color);
-            resize: none;
-            outline: none;
+            height: 8px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        #timer-bar {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+            border-radius: 10px;
+            transition: width 0.1s linear;
         }
 
-        .controls {
+        #game-area {
+            width: 100%;
+            height: 420px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 182, 193, 0.12));
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--accent);
+            margin-bottom: 15px;
+            cursor: none;
+        }
+
+        #basket {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            width: 75px;
+            height: 50px;
+            font-size: 2.8rem;
             display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
+            transform: translateX(-50%);
+            pointer-events: none;
+            z-index: 10;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        .falling-item {
+            position: absolute;
+            font-size: 2.2rem;
+            pointer-events: none;
+            will-change: transform;
+            filter: drop-shadow(0 3px 4px rgba(0,0,0,0.08));
+        }
+
+        .start-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 22px;
+            z-index: 20;
+            padding: 25px;
+        }
+
+        .start-screen p {
+            margin: 10px 0 15px 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            text-align: left;
+            background: rgba(0,0,0,0.02);
+            padding: 10px;
+            border-radius: 12px;
         }
 
         button {
-            background: var(--accent);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-family: 'Quicksand', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
             color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: none;
+            padding: 12px 35px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(255, 143, 163, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        body.night-vibe button {
+            box-shadow: 0 6px 15px rgba(177, 110, 255, 0.3);
         }
 
+        button:hover {
+            transform: scale(1.04);
+        }
         button:active {
-            transform: scale(0.95);
+            transform: scale(0.96);
         }
 
         .sparkle {
             position: absolute;
             pointer-events: none;
-            animation: floatUp 1s ease-out forwards;
-            font-size: 1.2rem;
-            z-index: 100;
+            animation: explodeOut 0.7s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            font-size: 1.3rem;
+            z-index: 15;
         }
 
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-70px) scale(1.6) rotate(20deg); opacity: 0; }
+        @keyframes explodeOut {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--mx), var(--my)) scale(0.4) rotate(45deg); opacity: 0; }
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .sub-btn {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            border-radius: 18px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--text-color);
+            box-shadow: none;
+        }
+        .sub-btn:hover {
+            background: rgba(255, 182, 193, 0.15);
+            transform: none;
+        }
+
+        .diary-phrase {
+            font-family: 'Caveat', cursive;
+            font-size: 1.5rem;
+            color: var(--accent-dark);
+            margin-top: 12px;
+            min-height: 35px;
+            line-height: 1.2;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="ambient-bg" id="ambient-bg"></div>
+
+    <div class="game-wrapper">
         <h1>A Perfect Day ✨</h1>
-        <p class="subtitle">Click each scene to curate a nostalgic, beautiful escape.</p>
+        <div class="high-score-tag">💖 Personal Best: <span id="high-score-val">0</span> pts</div>
         
-        <!-- Music Widget -->
-        <div class="music-player">
-            <div class="music-info">
-                <span class="disc" id="music-disc">🎵</span>
-                <div>
-                    <strong>Lo-Fi Background Symphony</strong><br>
-                    <small style="opacity: 0.7;">Calm Daydream Beats</small>
+        <div class="hud-panel">
+            <div class="hud-card">🌸 Score: <span id="score">0</span></div>
+            <div class="hud-card">🌆 Vibe: <span id="vibe-status">Morning</span></div>
+        </div>
+
+        <div id="timer-bar-container">
+            <div id="timer-bar"></div>
+        </div>
+
+        <div id="game-area">
+            <div class="start-screen" id="menu-overlay">
+                <h2 id="menu-title" style="font-family: 'Playfair Display'; color: var(--accent-dark);">Curate Your Day</h2>
+                <p id="menu-text">Catch cute items in your tea cup to construct the ultimate cozy timeline. Speed increases over time!</p>
+                
+                <div class="legend">
+                    <div>🥞 Treats: <b>+10 pts</b></div>
+                    <div>🌧️ Clouds: <b>-15 pts</b></div>
+                    <div>⭐ Stars: <b>+30 pts (Fast!)</b></div>
+                    <div>⏰ Limit: <b>45 Seconds</b></div>
                 </div>
+
+                <button onclick="startGame()">Start Day 🧸</button>
             </div>
-            <!-- Standard dynamic audio streaming element -->
-            <audio id="bg-audio" loop src="https://soundhelix.com"></audio>
-            <button onclick="toggleMusic()" id="play-btn" style="padding: 6px 15px; font-size: 0.85rem;">Play Melody 🎧</button>
+
+            <div id="basket">☕</div>
         </div>
 
-        <!-- Scrapbook Grid -->
-        <div class="moments-grid">
-            <div class="moment-card" onclick="showMemory('morning')">
-                <span>☕</span>
-                <h3>Morning</h3>
-            </div>
-            <div class="moment-card" onclick="showMemory('afternoon')">
-                <span>🌸</span>
-                <h3>Afternoon</h3>
-            </div>
-            <div class="moment-card" onclick="showMemory('evening')">
-                <span>🌅</span>
-                <h3>Golden Hour</h3>
-            </div>
-            <div class="moment-card" onclick="showMemory('night')">
-                <span>⭐</span>
-                <h3>Night</h3>
-            </div>
+        <div class="controls-row">
+            <button class="sub-btn" onclick="toggleMute()" id="mute-btn">🔇 Music: OFF</button>
+            <button class="sub-btn" onclick="manualAestheticSwitch()">🎨 Flip Vibe</button>
         </div>
-
-        <!-- Dynamic Display Box -->
-        <div class="display-box" id="memory-display">
-            "Tap any card to uncover the beautiful textures of an idealized day."
-        </div>
-
-        <!-- Interactive Diary Box for Judges -->
-        <div class="diary-section">
-            <h4>✍️ Write Your Own Perfect Day:</h4>
-            <textarea class="diary-input" placeholder="Type a memory here... (Watch it blend beautifully into the scrapbook format!)"></textarea>
-        </div>
-
-        <!-- Footer Systems -->
-        <div class="controls">
-            <button onclick="toggleNightMode()">Switch Aesthetic Vibe 🌙</button>
-            <button onclick="addSparkleButton(event)">Burst Sparkles 💖</button>
-        </div>
+        
+        <p class="diary-phrase" id="journal-text">Click play to spin your nostalgic narrative...</p>
     </div>
 
+    <audio id="lofi-player" loop crossorigin="anonymous" src="https://soundhelix.com"></audio>
+
     <script>
-        const memories = {
-            morning: "Warm cinnamon lattes, golden sunlight painting patterns on the floor tiles, and a soft breeze rustling through the lace curtains.",
-            afternoon: "A sudden velvet shadow across your desk, fresh wild strawberry macaroons, and finishing a hidden chapter of a leather-bound book.",
-            evening: "Dreamy peach-pink skies stretching outward, walking down quiet streets listening to an old comfort song on loop.",
-            night: "Huddled underneath standard cozy duvet blankets, watching distant city lights dance while feeling entirely at ease."
-        };
+        const gameArea = document.getElementById('game-area');
+        const basket = document.getElementById('basket');
+        const scoreDisplay = document.getElementById('score');
+        const highScoreVal = document.getElementById('high-score-val');
+        const vibeStatus = document.getElementById('vibe-status');
+        const journalText = document.getElementById('journal-text');
 
-        function showMemory(time) {
-            const display = document.getElementById('memory-display');
-            display.style.opacity = 0;
-            setTimeout(() => {
-                display.innerText = `"${memories[time]}"`;
-                display.style.opacity = 1;
-            }, 200);
-        }
-
-        function toggleNightMode() {
-            document.body.classList.toggle('dark-mode');
-        }
-
-        function toggleMusic() {
-            const audio = document.getElementById('bg-audio');
-            const button = document.getElementById('play-btn');
-            const disc = document.getElementById('music-disc');
-            
-            if (audio.paused) {
-                audio.play();
-                button.innerText = "Pause Melody ⏸️";
-                disc.classList.add('playing');
-            } else {
-                audio.pause();
-                button.innerText = "Play Melody 🎧";
-disc.classList.remove('playing');}}function addSparkleButton(e) {for (let i = 0; i < 6; i++) {createSparkle(e.clientX + (Math.random() * 50 - 25), e.clientY + (Math.random() * 50 - 25));}}window.addEventListener('click', (e) => {if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'TEXTAREA' && !e.target.closest('.moment-card')) {createSparkle(e.clientX, e.clientY);}});function createSparkle(x, y) {const sparkle = document.createElement('div');sparkle.className = 'sparkle';sparkle.innerText = ['✨', '💖', '🌸', '🎀', '🧁'][Math.floor(Math.random() * 5)];sparkle.style.left = ${x}px;sparkle.style.top = ${y}px;document.body.appendChild(sparkle);setTimeout(() => sparkle.remove(), 1000);}
+const menuOverlay = document.getElementById('menu-overlay');
+const menuTitle = document.getElementById('menu-title');
+const menuText = document.getElementById('menu-text');
+const timerBar = document.getElementById('timer-bar');
+const lofiPlayer = document.getElementById('lofi-player');
+const muteBtn = document.getElementById('mute-btn');
+const ambientBg = document.getElementById('ambient-bg');
+let score = 0;
+let highScore = 0;
+let isPlaying = false;
+let gameTimeLeft = 45;
+let loopInterval, spawnInterval, timerInterval, difficultyInterval;
+let activeItems = [];
+let itemSpawnRate = 750;
+let baseFallSpeed = 3.2;
+let isAudioMuted = true;
+const normalItems = ['🍓', '🎀', '🌸', '🥞', '🥐', '🧸', '🍦', '🧁', '🍵', '💌'];
+const dangerousItems = ['🌧️', '⚡'];
+const legendaryItems = ['⭐', '💫'];
+const diaryPhrases = [
+"Warm vanilla aroma filling up the clean kitchen tiles...",
+"Listening to vintage cassette tapes while reading poetry...",
+"Tying a soft silk ribbon neatly around your hair...",
+"The perfect sunset casting pink dust configurations everywhere...",
+"Wrapping yourself inside a warm linen blanket directly from the dryer..."
+];
+if(localStorage.getItem('cozyHighScore')) {
+highScore = parseInt(localStorage.getItem('cozyHighScore'));
+highScoreVal.innerText = highScore;
+}
+lofiPlayer.volume = 0.25;
+gameArea.addEventListener('mousemove', (e) => {
+if (!isPlaying) return;
+moveBasket(e.clientX);
+});
+gameArea.addEventListener('touchmove', (e) => {
+if (!isPlaying) return;
+if(e.touches.length > 0) {
+moveBasket(e.touches.clientX);
+}
+}, { passive: true });
+function moveBasket(clientX) {
+const rect = gameArea.getBoundingClientRect();
+let relativeX = clientX - rect.left;
+relativeX = Math.max(38, Math.min(relativeX, rect.width - 38));
+basket.style.left = ${relativeX}px;
+}
+function toggleMute() {
+if (isAudioMuted) {
+lofiPlayer.play().then(() => {
+isAudioMuted = false;
+muteBtn.innerText = "🔊 Music: ON";
+}).catch(err => {
+console.log("Audio blocked by layout constraints.");
+});
+} else {
+lofiPlayer.pause();
+isAudioMuted = true;
+muteBtn.innerText = "🔇 Music: OFF";
+}
+}
+function startGame() {
+score = 0;
+gameTimeLeft = 45;
+itemSpawnRate = 750;
+baseFallSpeed = 3.4;
+activeItems.forEach(i => i.element.remove());
+activeItems = [];
+isPlaying = true;
+scoreDisplay.innerText = score;
+menuOverlay.style.display = 'none';
+journalText.innerText = "The day is fresh, clean and entirely yours...";
+timerBar.style.width = "100%";
+if (!isAudioMuted) {
+lofiPlayer.play().catch(() => {});
+}
+loopInterval = setInterval(updateEngine, 1000 / 60);
+startSpawnRoutine();
+timerInterval = setInterval(() => {
+gameTimeLeft--;
+let percent = (gameTimeLeft / 45) * 100;
+timerBar.style.width = ${percent}%;
+if (gameTimeLeft % 7 === 0) {
+journalText.innerText = diaryPhrases[Math.floor(Math.random() * diaryPhrases.length)];
+}
+if (gameTimeLeft <= 0) {
+endGameRoutine();
+}
+}, 1000);
+difficultyInterval = setInterval(() => {
+if (itemSpawnRate > 300) {
+itemSpawnRate -= 90;
+baseFallSpeed += 0.6;
+clearInterval(spawnInterval);
+startSpawnRoutine();
+}
+}, 7500);
+}
+function startSpawnRoutine() {
+spawnInterval = setInterval(spawnItemEntity, itemSpawnRate);
+}
+function spawnItemEntity() {
+if (!isPlaying) return;
+const item = document.createElement('div');
+item.className = 'falling-item';
+let roll = Math.random();
+let type = 'normal';
+if (roll < 0.20) {
+type = 'danger';
+item.innerText = dangerousItems[Math.floor(Math.random() * dangerousItems.length)];
+} else if (roll > 0.86) {
+type = 'legendary';
+item.innerText = legendaryItems[Math.floor(Math.random() * legendaryItems.length)];
+} else {
+item.innerText = normalItems[Math.floor(Math.random() * normalItems.length)];
+}
+item.style.top = '-45px';
+const spawnX = Math.random() * (gameArea.clientWidth - 40);
+item.style.left = ${spawnX}px;
+gameArea.appendChild(item);
+let actualSpeed = baseFallSpeed + (Math.random() * 2);
+if (type === 'legendary') actualSpeed += 2.5;
+activeItems.push({
+element: item,
+y: -45,
+x: spawnX,
+speed: actualSpeed,
+type: type
+});
+}
+function updateEngine() {
+const basketRect = basket.getBoundingClientRect();
+for (let i = activeItems.length - 1; i >= 0; i--) {
+let item = activeItems[i];
+item.y += item.speed;
+item.element.style.transform = translateY(${item.y}px);
+const itemRect = item.element.getBoundingClientRect();
+if (
+itemRect.bottom >= basketRect.top + 6 &&
+itemRect.top <= basketRect.bottom &&
+itemRect.right >= basketRect.left + 8 &&
+itemRect.left <= basketRect.right - 8
+) {
+handleItemCollection(item);
+item.element.remove();
+activeItems.splice(i, 1);
+continue;
+}
+if (item.y > gameArea.clientHeight) {
+item.element.remove();
+activeItems.splice(i, 1);
+}
+}
+}
+function handleItemCollection(item) {
+if (item.type === 'normal') {
+score += 10;
+createBurstParticles(item.x, item.y, '🌸');
+} else if (item.type === 'legendary') {
+score += 30;
+createBurstParticles(item.x, item.y, '✨');
+} else if (item.type === 'danger') {
+score = Math.max(0, score - 15);
+createBurstParticles(item.x, item.y, '💧');
+}
+scoreDisplay.innerText = score;
+shiftVibeThemeBasedOnScore();
+}
+function shiftVibeThemeBasedOnScore() {
+if (score < 60) {
+vibeStatus.innerText = "Morning ☕";
+basket.innerText = "☕";
+document.body.classList.remove('night-vibe');
+} else if (score < 140) {
+vibeStatus.innerText = "Afternoon 🌸";
+basket.innerText = "🎀";
+document.body.classList.remove('night-vibe');
+} else if (score < 240) {
+vibeStatus.innerText = "Golden Hour 🌅";
+basket.innerText = "🍧";
+document.body.classList.remove('night-vibe');
+} else {
+vibeStatus.innerText = "Midnight Magic 🌙";
+basket.innerText = "🌌";
+document.body.classList.add('night-vibe');
+}
+}
+function manualAestheticSwitch() {
+document.body.classList.toggle('night-vibe');
+}
+function createBurstParticles(x, y, symbol) {
+for (let i = 0; i < 6; i++) {
+const particle = document.createElement('div');
+particle.className = 'sparkle';
+particle.innerText = symbol;
+particle.style.left = ${x}px;
+particle.style.top = ${y}px;
+const mx = (Math.random() * 90 - 45) + 'px';
+const my = (Math.random() * -70 - 15) + 'px';
+particle.style.setProperty('--mx', mx);
+particle.style.setProperty('--my', my);
+gameArea.appendChild(particle);
+setTimeout(() => particle.remove(), 650);
+}
+}
+function endGameRoutine() {
+isPlaying = false;
+clearInterval(loopInterval);
+clearInterval(spawnInterval);
+clearInterval(timerInterval);
+clearInterval(difficultyInterval);
+if (score > highScore) {
+highScore = score;
+localStorage.setItem('cozyHighScore', highScore);
+highScoreVal.innerText = highScore;
+}
+let rankEval = "Lovely Day! 🧁";
+if (score > 280) rankEval = "Absolute Perfect Masterpiece Master! 🏆✨";
+else if (score > 150) rankEval = "Beautiful Cozy Dreamer Vibe! 🌸";
+menuTitle.innerText = "Day Complete! 💕";
+menuText.innerHTML = You organized an exceptional timeline scenario.<br>Final Score: <strong>${score} Points</strong><br>Cozy Tier Rating: <b>${rankEval}</b>;
+menuOverlay.style.display = 'flex';
+journalText.innerText = "The sun sets cleanly on a beautifully spent day.";
+}
+for(let i=0; i<15; i++) {
+let dot = document.createElement('div');
+dot.innerText = ['🌸', '✨', '💖', '☁️'][Math.floor(Math.random()*4)];
+dot.style.position = 'absolute';
+dot.style.fontSize = ${Math.random() * 1 + 1}rem;
+dot.style.left = ${Math.random()*100}%;
+dot.style.top = ${Math.random()*100}%;
+dot.style.opacity = '0.25';
+ambientBg.appendChild(dot);
+}
